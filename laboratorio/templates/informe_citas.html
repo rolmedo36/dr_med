@@ -1,0 +1,54 @@
+{% extends "layouts/base3.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table" title="Citas">
+                <tr>
+                    <td>
+                        <label>Desde:</label>
+                        <input type="date" id="inFecha1" name="inFecha1" >
+                    </td>
+                    <td>
+                        <label>Hasta:</label>
+                        <input type="date" id="inFecha2" name="inFecha2" >
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="ACEPTAR"></td>
+                </tr>
+            </table>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Consultorio</th>
+                        <th>Cliente</th>
+                        <th>Servicio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for l in reporte%}
+                <tr>
+                    <td>{{ l.fecha }}</td>
+                    <td>{{ l.hora }}</td>
+                    <td>{{ l.consultorio }}</td>
+                    <td>{{ l.cliente }}</td>
+                    <td>{{ l.servicio }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</form>
+
+{% endblock %}

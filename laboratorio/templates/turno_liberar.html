@@ -1,0 +1,34 @@
+{% extends "layouts/base3.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table" title="TURNOS">
+                <tr>
+                    <td>
+                        <label>Turno:</label>
+                        <input autofocus size="3" type="text" id="turno_num" name="turno_num" placeholder="TURNO A LIBERAR" align="center">
+                    </td>
+                    <td>
+                        <label>Servicio:</label>
+                        <select name="cboServicios" id="cboServicios"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" value="Aceptar">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</form>
+<script src="{% static 'js/servicios.js' %}"></script>
+{% endblock %}

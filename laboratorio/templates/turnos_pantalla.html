@@ -1,0 +1,36 @@
+{% extends "layouts/base3.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table" title="Citas">
+                <tr>
+                    <th>TURNO</th>
+                    <th colspan="2">CONSULTORIO</th>
+                    <th></th>
+                </tr>
+                {% for l in turnos %}
+                <tr>
+                    <td><h1>{{ l.turno }}</h1></td>
+                    <!-- <td><h1>{{ l.consultorio }}</h1></td> -->
+                    <td><h1>{{ l.nombre }}</h1></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</form>
+
+<script>
+    setTimeout(function(){
+        window.location.reload();
+    }, 10000);
+</script>
+{% endblock %}

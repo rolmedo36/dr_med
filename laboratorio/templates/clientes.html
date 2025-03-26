@@ -1,0 +1,190 @@
+{% extends "layouts/base2.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="tipo" id="tipo" value="{{nuevo}}">
+    {% if nuevo == '0' %}
+        <main class="rov2">
+            <table class="table rov2">
+                <thead>
+                    <tr>
+                        <th scope="col">NOMBRE COMPLETO</th>
+                        <th scope="col">TELEFONOS</th>
+                        <th scope="col">CORREO</th>
+                        <th><a href="/clientes/0" style="text-decoration:none" >⏺️ Nuevo</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <th scope="col">{{ cliente.nombre }} {{ cliente.apellido_paterno }} {{ cliente.apellido_materno }}</th>
+                    <th scope="col">{{ cliente.telefono1 }} / {{ cliente.telefono2 }} </th>
+                    <th scope="col">{{ cliente.correo }}</th>
+                    <th scope="col">
+                        <a href="/clientes/1{{cliente.id}}" >🗑</a>
+                        <a href="/clientes/2{{cliente.id}}" >✎</a>
+                    </th>
+
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </main>
+    {% elif nuevo == '1' %}
+        <main class="rov2">
+            <div class="formfield">
+            <table class="table" title="NUEVO CLIENTE">
+                <tr align="right">
+                    <td scope="col">
+                        <label>NOMBRE:</label>
+                        {{ form.nombre }}
+                    </td>
+                    <td scope="col" >
+                        <label>APELLIDO PATERNO:</label>
+                        {{ form.apellido_paterno }}
+                    </td>
+                    <td scope="col">
+                        <label>APELLIDO MATERNO:</label>
+                        {{ form.apellido_materno }}
+                    </td>
+                </tr>
+                <tr align="right">
+                     <td scope="col" >
+                        <label>TELEFONO 1:</label>
+                        {{ form.telefono1 }}
+                    </td>
+                     <td scope="col" >
+                        <label>TELEFONO 2:</label>
+                        {{ form.telefono2 }}
+                    </td>
+                     <td scope="col" >
+                        <label>CORREO:</label>
+                        {{ form.correo }}
+                    </td>
+                </tr>
+                <tr align="right">
+                     <td scope="col" >
+                        <label>CP:</label>
+                        {{ form.codigo_postal }}
+                    </td>
+                     <td scope="col" >
+                        <label>ESTADO:</label>
+                         <label id="txtEstado"></label>
+                    </td>
+                     <td scope="col" >
+                        <label>CIUDAD:</label>
+                         <label id="txtCiudad"></label>
+                    </td>
+                </tr>
+                <tr align="right">
+                     <td scope="col" >
+                        <label>COLONIA:</label>
+                        <select name="cboColonia" id="cboColonia"></select>
+                    </td>
+                    <td scope="col" colspan="2">
+                        <label>CALLE:</label>
+                        {{ form.calle }}
+                    </td>
+                </tr>
+                <tr align="right">
+                     <td scope="col" >
+                        <label>Núm.Externo:</label>
+                         {{ form.numero_ext }}
+                    </td>
+                     <td scope="col" >
+                        <label>Núm.Interno:</label>
+                         {{ form.numero_int }}
+                    </td>
+                    <td scope="col" >
+                        <label>Fecha Nacimiento:</label>
+                         <input type="date" id="fecha_nac" name="fecha_nac">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" scope="col"><button type="submit">ACEPTAR</button></td>
+                </tr>
+            </table>
+            </div>
+        </main>
+    {% else %}
+        <h1>MODIFICA</h1>
+        <input type="hidden" id="id" name="id" value="{{clientes.id}}">
+        <main class="rov2">
+            <table class="table rov2" title="MODIFICA CLIENTE">
+<tr>
+                    <td scope="col" align="left">
+                        <label>NOMBRE:</label>
+                         <input type="text" size="40" id="nombre" name="nombre" value="{{clientes.nombre}}">
+                    </td>
+                    <td scope="col" align="left">
+                        <label>APELLIDO PATERNO:</label>
+                         <input type="text" size="40" id="apellido_paterno" name="apellido_paterno" value="{{clientes.apellido_paterno}}">
+                    </td>
+                    <td scope="col" align="left">
+                        <label>APELLIDO MATERNO:</label>
+                         <input type="text" size="40" id="apellido_materno" name="apellido_materno" value="{{clientes.apellido_materno}}">
+                    </td>
+                </tr>
+                <tr>
+                     <td scope="col" align="left">
+                        <label>TELEFONO 1:</label>
+                         <input type="text" size="40" id="telefono1" name="telefono1" value="{{clientes.telefono1}}">
+                    </td>
+                     <td scope="col" align="left">
+                        <label>TELEFONO 2:</label>
+                         <input type="text" size="40" id="telefono2" name="telefono2" value="{{clientes.telefono2}}">
+                    </td>
+                     <td scope="col" align="left">
+                        <label>CORREO:</label>
+                         <input type="text" size="40" id="correo" name="correo" value="{{clientes.correo}}">
+                    </td>
+                </tr>
+                <tr>
+                     <td scope="col" align="left">
+                        <label>CP:</label>
+                        <input type="text" size="15" id="codigo_postal" name="codigo_postal" value="{{clientes.codigopostal}}">
+                    </td>
+                     <td scope="col" align="left">
+                        <label>ESTADO:</label>
+                         <label id="txtEstado"></label>
+                    </td>
+                     <td scope="col" align="left">
+                        <label>CIUDAD:</label>
+                         <label id="txtCiudad"></label>
+                    </td>
+                </tr>
+                <tr>
+                     <td scope="col" align="left">
+                        <label>COLONIA:</label>
+                        <select name="cboColonia" id="cboColonia"></select>
+                    </td>
+                    <td scope="col" align="left" colspan="2">
+                        <label>CALLE:</label>
+                        <input type="text" size="40" id="calle" name="calle" value="{{clientes.calle}}">
+
+                    </td>
+                </tr>
+                <tr>
+                     <td scope="col" align="left">
+                        <label>Núm.Externo:</label>
+                        <input type="text" size="12" id="numero_ext" name="numero_ext" value="{{clientes.numero_ext}}">
+                    </td>
+                    <td scope="col" align="left">
+                        <label>Núm.Interno:</label>
+                        <input type="text" size="12" id="numero_int" name="numero_int" value="{{clientes.numero_int}}">
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="3" scope="col"><button type="submit">✅ACEPTAR</button></th>
+                </tr>
+            </table>
+        </main>
+    {% endif %}
+</form>
+<script src="{% static 'js/index.js' %}"></script>
+{% endblock %}

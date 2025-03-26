@@ -1,0 +1,78 @@
+{% extends "layouts/base2.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="tipo" id="tipo" value="{{nuevo}}">
+    {% if nuevo == '0' %}
+        <main class="rov2">
+            <table class="table rov2">
+                <thead>
+                    <tr>
+                        <th scope="col">DESCRIPCION</th>
+                        <th scope="col">PRECIO</th>
+                        <th><a href="/productos/0" style="text-decoration:none" >⏺️ Nuevo</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <th scope="col" align="left">{{ producto.descripcion }}</th>
+                    <th scope="col">{{ producto.precio }}</th>
+                    <th scope="col">
+                        <a href="/productos/1{{producto.id}}" >🗑</a>
+                        <a href="/productos/2{{producto.id}}" >✎</a>
+                    </th>
+
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </main>
+    {% elif nuevo == '1' %}
+        <main class="rov2">
+            <div class="formfield">
+            <table class="table" title="NUEVO PRODUCTO">
+                <tr>
+                    <td scope="col" align="left">
+                        <label>NOMBRE:</label>
+                        {{ form.nombre }}
+                    </td>
+                    <td scope="col" align="left">
+                        {{ form.descripcion }}
+                    </td>
+                    <td scope="col" align="left">
+                        <label>PRECIO:</label>
+                        {{ form.precio }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" scope="col"><button type="submit">ACEPTAR</button></td>
+                </tr>
+            </table>
+            </div>
+        </main>
+    {% else %}
+        <h1>MODIFICA</h1>
+        <main class="rov2">
+            <table class="table rov2" title="MODIFICA PRODUCTO">
+                <tr>
+                    <th scope="col">
+                        <label>Nombre:
+                            <input type="text" size="40" id="nombre" name="nombre" value="{{nombre}}">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col"><button type="submit">✅ACEPTAR</button></th>
+                </tr>
+            </table>
+        </main>
+    {% endif %}
+</form>
+
+{% endblock %}

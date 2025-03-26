@@ -1,0 +1,30 @@
+{% extends "layouts/base3.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table" title="TURNOS">
+                <tr>
+                    {% for turno in turnos %}
+                    <td colspan="20" style="padding: 80px;">
+                        <button type="submit" class="btn btn-primary btn-lg"
+                                style="height:300px;width:300px; font-size: 40px;"
+                                id="btnTurno" name="btnTurno" value="{{ turno.id }}" >
+                            {{ turno.descripcion }}
+                        </button>
+                    </td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</form>
+<!-- <script src="{% static 'js/turnos.js' %}"></script> -->
+{% endblock %}

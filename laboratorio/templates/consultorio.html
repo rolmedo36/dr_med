@@ -1,0 +1,63 @@
+{% extends "layouts/base2.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="tipo" id="tipo" value="{{nuevo}}">
+    {% if nuevo == '0' %}
+        <main class="rov2">
+            <table class="table rov2">
+                <thead>
+                    <tr><th scope="col">NOMBRE</th>
+                        <th><a href="/consultorio_mantto/0" style="text-decoration:none" >⏺️ Nuevo</a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for consultorio in consultorios %}
+                <tr>
+                    <th scope="col">{{ consultorio.nombre }}</th>
+                    <th scope="col">
+                        <a href="/consultorio_mantto/1{{consultorio.id}}" >🗑</a>
+                        <a href="/consultorio_mantto/2{{consultorio.id}}" >✎</a>
+                    </th>
+
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </main>
+    {% elif nuevo == '1' %}
+        <main class="rov2">
+            <table class="table rov2" title="NUEVO CONSULTORIO">
+                <tr>
+                    <th scope="col">{{ form.as_p }}</th>
+                </tr>
+                <tr>
+                    <th scope="col"><button type="submit">ACEPTAR</button></th>
+                </tr>
+            </table>
+        </main>
+    {% else %}
+        <h1>MODIFICA</h1>
+        <main class="rov2">
+            <table class="table rov2" title="NUEVO CONSULTORIO">
+                <tr>
+                    <th scope="col">
+                        <label>Nombre:
+                            <input type="text" size="40" id="nombre" name="nombre" value="{{nombre}}">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col"><button type="submit">✅ACEPTAR</button></th>
+                </tr>
+            </table>
+        </main>
+    {% endif %}
+</form>
+
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "layouts/base3.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="cita_id" name="cita_id" value="{{ cita_id }}">
+    <input type="hidden" id="consultorio_id" name="consultorio_id" value="{{ consultorio_id }}">
+    <input type="hidden" id="cliente_id" name="cliente_id" value="{{ cliente_id }}">
+    <input type="hidden" id="fecha" name="fecha" value="{{ fecha }}">
+    <input type="hidden" id="fecha_ini" name="fecha_ini" value="{{ fecha_ini }}">
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Atendiendo</th>
+                    <th colspan="2">Médico:
+                        <select id="cboMedicos" name="cboMedicos"></select>
+                    </th>
+                    <th>Checkin: {{fecha_ini}}</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr>
+                        <th>Hora</th>
+                        <th>Nombre</th>
+                        <th>Observaciones</th>
+                        <th>Servicio</th>
+                    </tr>
+                    {% for h in citas %}
+                        <tr>
+                            <td> {{h.hora}} </td>
+                            <td> {{h.nombre}} </td>
+                            <td> {{h.observaciones}} </td>
+                            <td> {{h.servicio}} </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-auto">
+            <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <td align="right">
+                        <label>Edad:</label>
+                        <input type="text" size="4" id="txtedad" name="txtedad">
+                    </td>
+                    <td align="right">
+                        <label>Sexo:</label>
+                        <select id="txtsexo" name="txtsexo">
+                            <option value="m">Mujer</option>
+                            <option value="h">Hombre</option>
+                            <option value="n">No decir</option>
+                        </select>
+                    </td>
+                    <td>
+                        <label>Peso Kg:</label>
+                        <input type="text" size="4" id="txtpeso" name="txtpeso">
+                    </td>
+                    <td>
+                        <label>Talla:</label>
+                        <input type="text" size="4" id="txttalla" name="txttalla">
+                    </td>
+                    <td>
+                        <label>Presión:</label>
+                        <input type="text" size="10" id="txtpresion" name="txtpresion">
+                    </td>
+                    <td>
+                        <label>Temperatura:</label>
+                        <input type="text" size="10" id="txttemperatura" name="txttemperatura">
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <label>Frecuencia Cardiaca:</label>
+                        <input type="text" size="10" id="txtcardiaca" name="txtcardiaca">
+                    </td>
+                    <td colspan="3">
+                        <label>Frecuencia Respiratoria:</label>
+                        <input type="text" size="10" id="txtrespiratoria" name="txtrespiratoria">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <th align="center"><label for="txtResumen">Resumen</label></th>
+                    <th align="center"><label for="txtExploracion">Exploración física</label></th>
+                    <th align="center"><label for="txtSrvAuxiliares">Resultados Auxiliares</label></th>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <textarea id="txtResumen" name="txtResumen" cols="40" rows="10"></textarea>
+                    </td>
+                    <td align="center">
+                        <textarea id="txtExploracion" name="txtExploracion" cols="40" rows="10"></textarea>
+                    </td>
+                    <td align="center">
+                        <textarea id="txtSrvAuxiliares" name="txtSrvAuxiliares" cols="40" rows="10"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <th align="center"><label for="txtProblemasClinicos">Problemas Clínicos</label></th>
+                    <th align="center"><label for="txtIndicacionesMedicas">Indicaciones Médicas</label></th>
+                    <th align="center"><label for="txtPronostico">Pronóstico</label></th>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea id="txtProblemasClinicos" name="txtProblemasClinicos" cols="40" rows="10"></textarea>
+                    </td>
+                    <td>
+                        <textarea id="txtIndicacionesMedicas" name="txtIndicacionesMedicas" cols="40" rows="10"></textarea>
+                    </td>
+                    <td>
+                        <textarea id="txtPronostico" name="txtPronostico" cols="40" rows="10"></textarea>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <button type="submit">Fin de consulta</button>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+<script src="{% static 'js/medicos.js' %}"></script>
+
+{% endblock %}

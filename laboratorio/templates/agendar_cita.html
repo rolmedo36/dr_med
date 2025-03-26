@@ -1,0 +1,41 @@
+{% extends "layouts/base3.html" %}
+
+{% load static %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="idconsultorio" value="{{ consultorio }}">
+    <input type="hidden" id="idservicio" value="{{ servicio }}">
+    <input type="hidden" id="fecha" value="{{ fecha }}">
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <label><b>Fecha:</b> {{ fecha2 }}</label>
+            <label><b>Consultorio:</b> {{ cons_nombre }}</label>
+            <label><b>Servicio:</b> {{ servicio_nombre }}</label>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Horarios</th>
+                </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    {% for h in horarios %}
+                        <tr>
+                            {% if 'RESERVADO' in h %}
+                                <td>{{ h }}</td>
+                            {% else %}
+                                <td><a href="/captura_reserva/{{ consultorio }}/{{ fecha }}/{{ h }}/{{servicio}}">{{ h }}</a></td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+
+<script src="{% static 'js/consultorios.js' %}"></script>
+{% endblock %}
