@@ -2,7 +2,7 @@ from datetime import datetime, date
 from django.db import connection
 import json
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse, Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.templatetags.static import static
 from .models import Menu, MenuOpciones, Consultorios, Medicos, Productos, Clientes, CodigoPostal, Citas, Turnos, Turnos_agenda
@@ -11,7 +11,8 @@ import ConectorPython
 from fpdf import FPDF
 from PIL import Image
 import os
-
+import subprocess
+import sys
 
 # Create your views here.
 def index(request):
@@ -650,61 +651,63 @@ def atender_consuta(request):
                 vp = my_custom_sql(vqp)
                 for i in vp:
                     vprecio = i[0]
-        vreceta = request.POST['txtIndicacionesMedicas']
-        vmedico = request.POST['cboMedicos']
-        vcliente_id = request.POST['cboClientes']
-        vconsultorio_id = '0'
 
-        medico_id = request.POST['cboMedicos']
-        checkin_fecha = request.POST['fecha_ini']
-        checkin_edad = request.POST['txtedad']
-        checkin_sexo = request.POST['txtsexo']
-        checkin_peso = request.POST['txtpeso']
-        checkin_talla = request.POST['txttalla']
-        checkin_presion_arterial = request.POST['txtpresion']
-        checkin_frecuencia_cardiaca = request.POST['txtcardiaca']
-        checkin_frecuencia_respiratoria = request.POST['txtrespiratoria']
-        checkin_temperatura = request.POST['txttemperatura']
-        checkin_resumen = request.POST['txtResumen']
-        checkin_exploracion_fisica = request.POST['txtExploracion']
-        checkin_resultado_servicios_auxiliares = request.POST['txtSrvAuxiliares']
-        checkin_problemas_clinicos = request.POST['txtProblemasClinicos']
-        checkin_indicaciones_medicas = request.POST['txtIndicacionesMedicas']
-        checkin_pronostico = request.POST['txtPronostico']
+            # Lee todos los datos capturados por el medico
+            vreceta = request.POST['txtIndicacionesMedicas']
+            vmedico = request.POST['cboMedicos']
+            vcliente_id = request.POST['cboClientes']
+            vconsultorio_id = '0'
 
-        vquery = f"""
-                INSERT INTO laboratorio_citas (consultorio_id,medico_id,cliente_id,fecha,hora,observaciones,checkin_edad,
-                    checkin_exploracion_fisica,checkin_fecha,checkin_frecuencia_cardiaca,checkin_frecuencia_respiratoria,
-                    checkin_indicaciones_medicas, checkin_peso,checkin_presion_arterial,checkin_problemas_clinicos,
-                    checkin_pronostico,checkin_resultado_servicios_auxiliares,checkin_resumen,checkin_sexo,checkin_talla,
-                    checkin_temperatura,checkout_hora,servicio_id,precio) 
-                    VALUES ('{vconsultorio_id}','{vmedico}','{vcliente_id}','{dt_hoy}','{dt_hora}','','{checkin_edad}','{checkin_exploracion_fisica}','{dt_hoy}','{checkin_frecuencia_cardiaca}',
-                    '{checkin_frecuencia_respiratoria}','{checkin_indicaciones_medicas}','{checkin_peso}','{checkin_presion_arterial}','{checkin_problemas_clinicos}',
-                    '{checkin_pronostico}','{checkin_resultado_servicios_auxiliares}','{checkin_resumen}','{checkin_sexo}','{checkin_talla}','{checkin_temperatura}','{checkout_hora}','{vservicio}','{vprecio}')
+            medico_id = request.POST['cboMedicos']
+            checkin_fecha = request.POST['fecha_ini']
+            checkin_edad = request.POST['txtedad']
+            checkin_sexo = request.POST['txtsexo']
+            checkin_peso = request.POST['txtpeso']
+            checkin_talla = request.POST['txttalla']
+            checkin_presion_arterial = request.POST['txtpresion']
+            checkin_frecuencia_cardiaca = request.POST['txtcardiaca']
+            checkin_frecuencia_respiratoria = request.POST['txtrespiratoria']
+            checkin_temperatura = request.POST['txttemperatura']
+            checkin_resumen = request.POST['txtResumen']
+            checkin_exploracion_fisica = request.POST['txtExploracion']
+            checkin_resultado_servicios_auxiliares = request.POST['txtSrvAuxiliares']
+            checkin_problemas_clinicos = request.POST['txtProblemasClinicos']
+            checkin_indicaciones_medicas = request.POST['txtIndicacionesMedicas']
+            checkin_pronostico = request.POST['txtPronostico']
+
+            vquery = f"""
+                    INSERT INTO laboratorio_citas (consultorio_id,medico_id,cliente_id,fecha,hora,observaciones,checkin_edad,
+                        checkin_exploracion_fisica,checkin_fecha,checkin_frecuencia_cardiaca,checkin_frecuencia_respiratoria,
+                        checkin_indicaciones_medicas, checkin_peso,checkin_presion_arterial,checkin_problemas_clinicos,
+                        checkin_pronostico,checkin_resultado_servicios_auxiliares,checkin_resumen,checkin_sexo,checkin_talla,
+                        checkin_temperatura,checkout_hora,servicio_id,precio) 
+                        VALUES ('{vconsultorio_id}','{vmedico}','{vcliente_id}','{dt_hoy}','{dt_hora}','','{checkin_edad}','{checkin_exploracion_fisica}','{dt_hoy}','{checkin_frecuencia_cardiaca}',
+                        '{checkin_frecuencia_respiratoria}','{checkin_indicaciones_medicas}','{checkin_peso}','{checkin_presion_arterial}','{checkin_problemas_clinicos}',
+                        '{checkin_pronostico}','{checkin_resultado_servicios_auxiliares}','{checkin_resumen}','{checkin_sexo}','{checkin_talla}','{checkin_temperatura}','{checkout_hora}','{vservicio}','{vprecio}')
+                """
+            my_custom_sql(vquery)
+
+            # Actualiza turno como atendido
+            vquery = f"""
+                UPDATE laboratorio_turnos_agenda SET hora_atencion = '{dt_hora}'
+                WHERE fecha = '{vfecha}' AND turno_num = '{vturno_num}'
             """
-        my_custom_sql(vquery)
+            my_custom_sql(vquery)
 
-        # Actualiza turno como atendido
-        vquery = f"""
-            UPDATE laboratorio_turnos_agenda SET hora_atencion = '{dt_hora}'
-            WHERE fecha = '{vfecha}' AND turno_num = '{vturno_num}'
-        """
-        my_custom_sql(vquery)
+            # Lee datos de medico
+            vquery = f"""
+                        SELECT m.nombre 
+                        FROM laboratorio_medicos m
+                        WHERE 1=1
+                            AND m.id = '{vmedico}' 
+                        """
+            r = my_custom_sql(vquery)
+            vmedico_datos = ""
+            for i in r:
+                vmedico_datos = i[0]
 
-        # Lee datos de medico
-        vquery = f"""
-                    SELECT m.nombre 
-                    FROM laboratorio_medicos m
-                    WHERE 1=1
-                        AND m.id = '{vmedico}' 
-                    """
-        r = my_custom_sql(vquery)
-        vmedico_datos = ""
-        for i in r:
-            vmedico_datos = i[0]
-
-        # Imprime la receta en PDF
-        imprime_receta(vreceta, dt_archivo, vmedico_datos)
+            # Imprime la receta en PDF
+            imprime_receta(vreceta, dt_archivo, vmedico_datos)
 
         return redirect('index')
 
@@ -755,7 +758,8 @@ def turnos(request):
         vhora = now.strftime("%H:%M:%S")
         # Lee el ultimo
         vq = f"""
-            SELECT turno_num FROM laboratorio_turnos_agenda WHERE fecha='{vfecha}' AND turno_id='{vturno}' ORDER BY id DESC LIMIT 1
+            -- SELECT turno_num FROM laboratorio_turnos_agenda WHERE fecha='{vfecha}' AND turno_id='{vturno}' ORDER BY id DESC LIMIT 1
+            SELECT turno_num FROM laboratorio_turnos_agenda WHERE fecha='{vfecha}' ORDER BY id DESC LIMIT 1
             """
         r = my_custom_sql(vq)
         if len(r) > 0:
@@ -803,8 +807,8 @@ def turno_liberar(request):
 
 
 def imprime_receta(vreceta, varchivo, vmedico):
+    vpath = "/opt/progs/it911/staticfiles/media/"
     varchivo = varchivo + ".pdf"
-    print(vreceta, varchivo, vmedico)
     # vimagen = 'C:\\Users\\rolme\\Documents\\projects\\laboratorio\\laboratorio\\static\\logo1.jpeg'
     vimagen = '/opt/progs/it911/laboratorio/static/logo1.jpeg'
 
@@ -868,13 +872,20 @@ def imprime_receta(vreceta, varchivo, vmedico):
                 Firma doctor
                 """,
         border=0)
-    pdf.output(varchivo, 'F')
+    pdf.output(vpath + varchivo, 'F')
 
-    import sys
+    # subprocess.run(['xdg-open', varchivo])
+    print('plataforma: ', sys.platform)
+    if sys.platform.startswith('win'):
+        os.startfile(vpath + varchivo)
     if sys.platform.startswith("linux"):
-        os.system(f"xdg-open {varchivo}")
-    else:
-        os.system(varchivo)
+        os.system(f"xdg-open {vpath + varchivo}")
+    elif sys.platform.startswith('darwin'):
+        # macOS-specific code
+        os.system(f'open {vpath + varchivo}')
+
+    with open('output.txt', 'w') as file:
+        file.write('AQUI ' + varchivo)
 
 
 def abrir_consultorio(request):
@@ -890,13 +901,51 @@ def abrir_consultorio(request):
         'title': 'LIBERAR CONSULTORIO'
     })
 
-
 def turnos_pantalla(request):
     now = datetime.now()
     dt_string = now.strftime("%Y-%m-%d")
     # dt_string = '2024-05-10'
+    j2 = []
+    # Lee los turnos en espera
+    vq = f"""
+        SELECT 
+            ta.turno_num, 
+            ta.consultorio,
+            t.descripcion 
+        FROM 
+            laboratorio_turnos_agenda ta,            
+            laboratorio_turnos t         
+        WHERE 1=1
+            AND fecha = '{dt_string}'
+            AND liberado = 'S'
+            AND hora_atencion = ''
+            AND t.id = ta.turno_id
+        ORDER By turno_num 
+    """
+    r = my_custom_sql(vq)
+    i = 0
+    j = '['
+    consultorio = ''
+    turno = ''
+    for i in r:
+        j += ('{"consultorio": "' + str(i[1]) + '", "turno": "' + str(i[0]) + '", "descripcion": "' + str(i[2]) + '"' + '},')
 
-    # Limpia turnos mostrados solo el primero cuando sean mas de 10 en la fila
+    j += ']'
+    j = j[0:len(j) - 2] + ']'
+    if len(j) > 3:
+        j2 = json.loads(j)
+
+    return render(request, 'turnos_pantalla.html', {
+            'title': 'TURNOS',
+            'turnos': j2
+        })
+
+def turnos_pantalla3(request):
+    now = datetime.now()
+    dt_string = now.strftime("%Y-%m-%d")
+    # dt_string = '2024-05-10'
+    j2 = []
+    # 1 Limpia turnos mostrados solo el primero cuando sean mas de 10 en la fila
     vq = "SELECT turno_num FROM laboratorio_consultorios_turnos ORDER By turno_num"
     r = my_custom_sql(vq)
     if len(r) > 10:
@@ -907,7 +956,7 @@ def turnos_pantalla(request):
     # vq = "DELETE FROM laboratorio_Consultorios_Turnos"
     # my_custom_sql(vq)
 
-    # Lee consultorios disponibles
+    # 2 Lee consultorios disponibles
     vquery = f"""
         SELECT c.id, c.tipo_id, c.nombre
         FROM 
@@ -916,12 +965,13 @@ def turnos_pantalla(request):
             AND c.disponible = 'S'
     """
     r = my_custom_sql(vquery)
+
     if len(r) > 0:
         for i in r:
             vcons_id = i[0]
             vtipo_id = i[1]
             vcons_nombre = i[2]
-            # Lee turnos de ese tipo de servicio del consultorio.
+            # 3 Lee turnos de ese tipo de servicio del consultorio.
             vquery = f"""
                 SELECT ta.turno_num, ta.id
                 FROM 
@@ -929,8 +979,9 @@ def turnos_pantalla(request):
                 WHERE 1=1
                     AND ta.fecha = '{dt_string}'
                     AND ta.turno_id = '{vtipo_id}'
-                    AND ta.mostrado = 'N'
+                    -- AND ta.mostrado = 'N'
                     AND ta.liberado = 'S'
+                    AND ta.hora_atencion = ''
                 LIMIT 1
 
             """
@@ -943,50 +994,49 @@ def turnos_pantalla(request):
                     vinsert = f"""
                         INSERT INTO laboratorio_consultorios_turnos (cons_id, turno_num, nombre) VALUES('{vcons_id}','{vturno_num}','{vcons_nombre}' )
                     """
-                    print("AQUI", vinsert)
                     my_custom_sql(vinsert)
-                    # Consultorio marcado como ocupado
-                    vquery = f"""
-                        UPDATE laboratorio_consultorios 
-                        SET disponible = 'N'
-                        WHERE id = {vcons_id}
-                    """
-                    my_custom_sql(vquery)
+                    # # Consultorio marcado como ocupado
+                    # vquery = f"""
+                    #     UPDATE laboratorio_consultorios
+                    #     SET disponible = 'N'
+                    #     WHERE id = {vcons_id}
+                    # """
+                    # my_custom_sql(vquery)
 
-                    # ACTUALIZA EL TURNO COMO YA MOSTRADO
+                    # # ACTUALIZA EL TURNO COMO YA MOSTRADO
+                    # vquery = f"""
+                    #     UPDATE laboratorio_turnos_agenda
+                    #     SET mostrado = 'S'
+                    #     WHERE 1=1
+                    #     AND id = {vturno_id}
+                    # """
+                    # my_custom_sql(vquery)
+
+                    # 4 Lee la tabla de turnos
                     vquery = f"""
-                        UPDATE laboratorio_turnos_agenda 
-                        SET mostrado = 'S'
+                        SELECT c.cons_id, c.turno_num, c.nombre
+                        FROM 
+                            laboratorio_consultorios_turnos c
                         WHERE 1=1
-                        AND id = {vturno_id}
                     """
-                    my_custom_sql(vquery)
-                    print('turno_id', vturno_id)
+                    r = my_custom_sql(vquery)
+                    i = 0
+                    j2 = ''
+                    j = '['
+                    consultorio = ''
+                    turno = ''
+                    if len(r) > 0:
+                        for i in r:
+                            consultorio = i[0]
+                            turno = i[1]
+                            turno_id = i[2]
+                            j += ('{"consultorio": "' + str(i[0]) + '", "turno": "' + str(i[1]) + '", "nombre": "' + str(i[2]) + '"' + '},')
 
-    # Lee la tabla de turnos
-    vquery = f"""
-        SELECT c.cons_id, c.turno_num, c.nombre
-        FROM 
-            laboratorio_consultorios_turnos c
-        WHERE 1=1
-    """
-    r = my_custom_sql(vquery)
-    i = 0
-    j2 = ''
-    j = '['
-    consultorio = ''
-    turno = ''
-    if len(r) > 0:
-        for i in r:
-            consultorio = i[0]
-            turno = i[1]
-            turno_id = i[2]
-            j += ('{"consultorio": "' + str(i[0]) + '", "turno": "' + str(i[1]) + '", "nombre": "' + str(i[2]) + '"' + '},')
-
-        j += ']'
-        j = j[0:len(j) - 2] + ']'
-        j2 = json.loads(j)
-
+                        j += ']'
+                        j = j[0:len(j) - 2] + ']'
+                        j2 = json.loads(j)
+    else:
+        j2 = []
     return render(request, 'turnos_pantalla.html', {
         'title': 'TURNOS',
         'turnos': j2
@@ -1038,3 +1088,14 @@ def my_custom_sql(vquery):
     cursor.execute(vquery)
     row = cursor.fetchall()
     return row
+
+def serve_pdf(request, filename):
+    # Path to the directory where PDFs are stored
+    pdf_directory = '/opt/progs/it911/staticfiles/media/'
+    pdf_path = os.path.join(pdf_directory, filename)
+    print('EN EL PDF: ', pdf_path)
+    if os.path.exists(pdf_path):
+        # Open the file in binary mode and return it as a response
+        return FileResponse(open(pdf_path, 'rb'), content_type='application/pdf')
+    else:
+        raise Http404("PDF not found")

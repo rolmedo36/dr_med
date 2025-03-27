@@ -99,9 +99,10 @@ class Citas(models.Model):
 
 class Turnos(models.Model):
     descripcion = models.CharField(max_length=100)
+    tipo_id = models.CharField(max_length=2, default="1")  # (laboratorio, consulta, lentes, etc)
 
     def __str__(self):
-        return str(self.id) + " - " + self.descripcion
+        return str(self.id) + " - " + self.descripcion + " - " + self.tipo_id
 
 
 class Turnos_agenda(models.Model):
@@ -113,6 +114,7 @@ class Turnos_agenda(models.Model):
     mostrado = models.CharField(max_length=1, default='S')
     liberado = models.CharField(max_length=1, default='N')
     producto_id = models.CharField(max_length=10, default='6')
+    consultorio = models.CharField(max_length=100, default='')
 
     def __str__(self):
         return str(self.id) + " - " + self.turno_id + " - " + self.fecha + " - " + self.hora

@@ -3,29 +3,57 @@
 {% load static %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+<!-- <h1>{{ title }}</h1> -->
 
 <form action="" method="POST">
     {% csrf_token %}
-    <div class="row justify-content-center">
-        <div class="col-auto">
-            <table class="table" title="Citas">
-                <tr>
-                    <th>TURNO</th>
-                    <th colspan="2">CONSULTORIO</th>
-                    <th></th>
-                </tr>
-                {% for l in turnos %}
-                <tr>
-                    <td><h1>{{ l.turno }}</h1></td>
-                    <!-- <td><h1>{{ l.consultorio }}</h1></td> -->
-                    <td><h1>{{ l.nombre }}</h1></td>
-                </tr>
-                {% endfor %}
-            </table>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="text-center">TURNOS EN FILA</h3>
+                <div class="col-auto">
+                    <table class="table" title="Citas">
+                        <tr>
+                            <th>TURNO</th>
+                            <th colspan="2">TIPO SERVICIO</th>
+                            <th></th>
+                        </tr>
+                        {% for l in turnos %}
+                            {% if not l.consultorio %}
+                                <tr>
+                                    <td><h1>{{ l.turno }}</h1></td>
+                                    <!-- <td><h1>{{ l.consultorio }}</h1></td> -->
+                                    <td><h1>{{ l.descripcion }}</h1></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <!-- SEGUNDA COLUMNA -->
+            <div class="col-md-6">
+                <h3 class="text-center">ATENDIENDO</h3>
+                <div class="col-auto">
+                    <table class="table" title="Citas">
+                        <tr>
+                            <th>TURNO</th>
+                            <th colspan="2">CONSULTORIO</th>
+                            <th></th>
+                        </tr>
+                        {% for l in turnos %}
+                            {% if l.consultorio %}
+                                <tr>
+                                    <td><h1>{{ l.turno }}</h1></td>
+                                    <!-- <td><h1>{{ l.consultorio }}</h1></td> -->
+                                    <td><h1>{{ l.consultorio }}</h1></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-
 </form>
 
 <script>
