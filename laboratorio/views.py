@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, FileResponse, Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.templatetags.static import static
+from django.urls import reverse
 from .models import Menu, MenuOpciones, Consultorios, Medicos, Productos, Clientes, CodigoPostal, Citas, Turnos, Turnos_agenda
 from .forms import CreateNewConsultorio, CreateNewMedico, CreateNewProductos, CreateNewClientes
 import ConectorPython
@@ -502,6 +503,93 @@ def informe_citas(request):
         'reporte': j2,
     })
 
+def informe_expediente(request):
+    if request.method == 'POST':
+        vcliente_id = request.POST['cboClientes']
+
+        vquery = f"""
+            SELECT 
+                lc.id,
+                lc.fecha,
+                lc.hora,
+                lm.nombre,
+                CONCAT(lc2.nombre,' ',lc2.apellido_paterno) as cliente,
+                lc.checkin_edad,
+                lc.checkin_sexo,
+                lc.checkin_peso,
+                lc.checkin_talla,
+                lc.checkin_presion_arterial,
+                lc.checkin_frecuencia_cardiaca,
+                lc.checkin_frecuencia_respiratoria,
+                lc.checkin_temperatura,
+                lc.checkin_resumen,
+                lc.checkin_exploracion_fisica,
+                lc.checkin_resultado_servicios_auxiliares,
+                lc.checkin_problemas_clinicos,
+                lc.checkin_indicaciones_medicas,
+                lc.checkin_pronostico,
+                lc.turno_num,
+                lta.hora
+            FROM
+                laboratorio_citas lc,
+                laboratorio_medicos lm,
+                laboratorio_clientes lc2,
+                laboratorio_turnos_agenda lta 
+            WHERE 1=1
+                AND lc.cliente_id = {vcliente_id}
+                AND lm.id = lc.medico_id
+                AND lc2.id = lc.cliente_id
+                AND (lta.turno_num = lc.turno_num AND lta.fecha = lc.fecha)
+            ORDER BY lc.fecha DESC
+        """
+
+        # Use parameterized queries to prevent SQL injection
+        r = my_custom_sql(vquery)
+
+        # Prepare data
+        results = []
+        for row in r:
+            record = {
+                "id": str(row[0]),
+                "fecha": str(row[1]),
+                "hora_fin": str(row[2]),
+                "medico": row[3],
+                "cliente": row[4],
+                "edad": str(row[5]),
+                "sexo": row[6],
+                "peso": str(row[7]),
+                "talla": str(row[8]),
+                "presion_arterial": str(row[9]),
+                "frecuencia_cardiaca": str(row[10]),
+                "frecuencia_respiratoria": str(row[11]),
+                "temperatura": str(row[12]),
+                "resumen": escape_newlines(row[13]),
+                "exploracion_fisica": escape_newlines(row[14]),
+                "resultado_servicios_auxiliares": escape_newlines(row[15]),
+                "problemas_clinicos": escape_newlines(row[16]),
+                "indicaciones_medicas": escape_newlines(row[17]),
+                "pronostico": escape_newlines(row[18]),
+                "turno_num": str(row[19]),
+                "hora_ini": str(row[20]),
+            }
+
+            # Escape newline characters in string fields
+            for key, value in record.items():
+                record[key] = escape_newlines(value)
+
+            results.append(record)
+
+        # Convert results to JSON
+        j2 = json.dumps(results)
+        # Return the response
+        return render(request, 'informe_expediente2.html', {
+            'title': 'Expediente Clínico',
+            'reporte': json.loads(j2)
+        })
+
+    return render(request, 'informe_expediente.html', {
+        'title': 'Expediente Clínico'
+    })
 
 def atender_cita(request):
     if request.method == "POST":
@@ -623,7 +711,7 @@ def atender_cita3(request, idcita):
 
 def atender_consuta(request):
     now = datetime.now()
-    dt_hoy = now.strftime("%d/%m/%Y")
+    dt_hoy = now.strftime("%Y-%m-%d")
     dt_hora = now.strftime("%H:%M:%S")
     vfecha = now.strftime("%Y-%m-%d")
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -680,10 +768,10 @@ def atender_consuta(request):
                         checkin_exploracion_fisica,checkin_fecha,checkin_frecuencia_cardiaca,checkin_frecuencia_respiratoria,
                         checkin_indicaciones_medicas, checkin_peso,checkin_presion_arterial,checkin_problemas_clinicos,
                         checkin_pronostico,checkin_resultado_servicios_auxiliares,checkin_resumen,checkin_sexo,checkin_talla,
-                        checkin_temperatura,checkout_hora,servicio_id,precio) 
+                        checkin_temperatura,checkout_hora,servicio_id,precio,turno_num) 
                         VALUES ('{vconsultorio_id}','{vmedico}','{vcliente_id}','{dt_hoy}','{dt_hora}','','{checkin_edad}','{checkin_exploracion_fisica}','{dt_hoy}','{checkin_frecuencia_cardiaca}',
                         '{checkin_frecuencia_respiratoria}','{checkin_indicaciones_medicas}','{checkin_peso}','{checkin_presion_arterial}','{checkin_problemas_clinicos}',
-                        '{checkin_pronostico}','{checkin_resultado_servicios_auxiliares}','{checkin_resumen}','{checkin_sexo}','{checkin_talla}','{checkin_temperatura}','{checkout_hora}','{vservicio}','{vprecio}')
+                        '{checkin_pronostico}','{checkin_resultado_servicios_auxiliares}','{checkin_resumen}','{checkin_sexo}','{checkin_talla}','{checkin_temperatura}','{checkout_hora}','{vservicio}','{vprecio}','{vturno_num}')
                 """
             my_custom_sql(vquery)
 
@@ -707,8 +795,14 @@ def atender_consuta(request):
                 vmedico_datos = i[0]
 
             # Imprime la receta en PDF
-            imprime_receta(vreceta, dt_archivo, vmedico_datos)
+            pdf_path = imprime_receta(vreceta, dt_archivo, vmedico_datos)
+            # Generate the download URL (assuming your 'download_pdf' URL is set up correctly)
+            download_url = reverse('download_pdf', kwargs={'filename': pdf_path.split('/')[-1]})
 
+            # Render the template with the download URL, where you want to show the link
+            return render(request, 'temp_pdf.html', {
+                'download_url': download_url
+            })
         return redirect('index')
 
     return render(request, 'atender_consulta.html', {
@@ -807,7 +901,7 @@ def turno_liberar(request):
 
 
 def imprime_receta(vreceta, varchivo, vmedico):
-    vpath = "/opt/progs/it911/staticfiles/media/"
+    vpath = "/opt/progs/it911/static/pdfs/"
     varchivo = varchivo + ".pdf"
     # vimagen = 'C:\\Users\\rolme\\Documents\\projects\\laboratorio\\laboratorio\\static\\logo1.jpeg'
     vimagen = '/opt/progs/it911/laboratorio/static/logo1.jpeg'
@@ -873,20 +967,23 @@ def imprime_receta(vreceta, varchivo, vmedico):
                 """,
         border=0)
     pdf.output(vpath + varchivo, 'F')
+    return vpath + varchivo
 
     # subprocess.run(['xdg-open', varchivo])
-    print('plataforma: ', sys.platform)
-    if sys.platform.startswith('win'):
-        os.startfile(vpath + varchivo)
-    if sys.platform.startswith("linux"):
-        os.system(f"xdg-open {vpath + varchivo}")
-    elif sys.platform.startswith('darwin'):
-        # macOS-specific code
-        os.system(f'open {vpath + varchivo}')
 
-    with open('output.txt', 'w') as file:
-        file.write('AQUI ' + varchivo)
+    # if sys.platform.startswith('win'):
+    #     os.startfile(vpath + varchivo)
+    # if sys.platform.startswith("linux"):
+    #     os.system(f"xdg-open {vpath + varchivo}")
+    # elif sys.platform.startswith('darwin'):
+    #     # macOS-specific code
+    #     os.system(f'open {vpath + varchivo}')
 
+    # download_url = reverse('download_pdf', kwargs={'filename': varchivo})
+    # return render(request, 'temp_pdf.html', {
+    #     'download_url': download_url
+    # })
+    # # return redirect(download_url)
 
 def abrir_consultorio(request):
     if request.method == 'POST':
@@ -1082,6 +1179,19 @@ def imprime_ticket(vturno, vsiguiente, vfecha):
     printer_name = "principal"  # Replace with your printer's name
     os.system(f"lp -d {printer_name} -o raw {varchivo} &")
 
+# Function to replace newlines in the text
+def escape_newlines(data):
+    if isinstance(data, str):
+        return data.replace("\n", "<br>")
+    return data
+
+    # if isinstance(data, str):
+    #     return data.replace("\n", "\\n")
+    # elif isinstance(data, dict):
+    #     return {key: escape_newlines(value) for key, value in data.items()}
+    # elif isinstance(data, list):
+    #     return [escape_newlines(item) for item in data]
+    # return data
 
 def my_custom_sql(vquery):
     cursor = connection.cursor()
@@ -1091,7 +1201,7 @@ def my_custom_sql(vquery):
 
 def serve_pdf(request, filename):
     # Path to the directory where PDFs are stored
-    pdf_directory = '/opt/progs/it911/staticfiles/media/'
+    pdf_directory = '/opt/progs/it911/static/pdfs/'
     pdf_path = os.path.join(pdf_directory, filename)
     print('EN EL PDF: ', pdf_path)
     if os.path.exists(pdf_path):

@@ -1,0 +1,63 @@
+{% extends "layouts/base3.html" %}
+
+{% load static %}
+
+{% block content %}
+    <h1 class="text-center mt-5">{{ title }}</h1>
+    <!-- Table to display the report -->
+    <div class="table-container">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+            <th>Turno Num</th>
+            <th>Fecha</th>
+            <th>Hora Inicial</th>
+            <th>Hora Fin</th>
+            <th>Medico</th>
+            <th>Cliente</th>
+            <th>Edad</th>
+            <th>Sexo</th>
+            <th>Peso</th>
+            <th>Talla</th>
+            <th>Presión Arterial</th>
+            <th>Frecuencia Cardíaca</th>
+            <th>Frecuencia Respiratoria</th>
+            <th>Temperatura</th>
+            <th>Resumen</th>
+            <th>Exploración Física</th>
+            <th>Resultado Servicios Auxiliares</th>
+            <th>Problemas Clínicos</th>
+            <th>Indicaciones Médicas</th>
+            <th>Pronóstico</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in reporte %}
+                <tr>
+                <td>{{ item.turno_num }}</td>
+                <td>{{ item.fecha }}</td>
+                <td>{{ item.hora_ini }}</td>
+                <td>{{ item.hora_fin }}</td>
+                <td>{{ item.medico }}</td>
+                <td>{{ item.cliente }}</td>
+                <td>{{ item.edad }}</td>
+                <td>{{ item.sexo }}</td>
+                <td>{{ item.peso }}</td>
+                <td>{{ item.talla }}</td>
+                <td>{{ item.presion_arterial }}</td>
+                <td>{{ item.frecuencia_cardiaca }}</td>
+                <td>{{ item.frecuencia_respiratoria }}</td>
+                <td>{{ item.temperatura }}</td>
+                <td>{{ item.resumen|safe }}</td>
+                <td>{{ item.exploracion_fisica|safe }}</td>
+                <td>{{ item.resultado_servicios_auxiliares|safe }}</td>
+                <td>{{ item.problemas_clinicos|safe }}</td>
+                <td>{{ item.indicaciones_medicas|safe }}</td>
+                <td>{{ item.pronostico|safe }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

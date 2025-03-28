@@ -20,6 +20,7 @@ urlpatterns = [
     path('get_clientes/<str:inCliente>', views.get_clientes, name='get_clientes'),
     path('graba_reserva/', views.graba_reserva, name='graba_reserva'),
     path('informe_citas/', views.informe_citas, name='informe_citas'),
+    path('expediente/', views.informe_expediente, name='expediente'),
     path('atender_cita/', views.atender_cita, name='atender_cita'),
     path('atender_cita3/<int:idcita>', views.atender_cita3, name='atender_cita3'),
     path('get_medicos/', views.get_medicos, name='get_medicos'),
@@ -31,6 +32,6 @@ urlpatterns = [
     path('atender_consuta/', views.atender_consuta, name='atender_consuta'),
     path('get_turno/<str:turno_num>', views.get_turno, name='get_turno'),
     # para downloads
-    path('download_pdf/<str:filename>/', views.serve_pdf, name='download_pdf'),
+    path('download_pdf/<str:filename>', views.serve_pdf, name='download_pdf'),
 
 ]

@@ -1,0 +1,32 @@
+{% extends "layouts/base4.html" %}
+
+{% load static %}
+
+{% block content %}
+<!--        <h2>Click para ver receta:</h2>-->
+<!--        <a href="{{ download_url }}" target="_blank">Click para ver receta</a>-->
+<!--        <a href="/abrir_consultorio/">Regresar</a>-->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>La receta esta lista</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Da click en el boton para abrir y la receta</h5>
+                    <p class="card-text">
+                        Una vez abierta puedes imprimirla.
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{{ download_url }}" target="_blank" class="btn btn-success btn-lg">Abrir Receta</a>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="text-muted">Dr.Med</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

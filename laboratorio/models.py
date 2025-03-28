@@ -92,6 +92,7 @@ class Citas(models.Model):
     checkin_indicaciones_medicas = models.TextField(max_length=500, default='')
     checkin_pronostico = models.TextField(max_length=500, default='')
     checkout_hora = models.TextField(max_length=12, default='')
+    turno_num = models.IntegerField(default=0)
 
     def __str__(self):
         return self.fecha + " - " + self.hora
