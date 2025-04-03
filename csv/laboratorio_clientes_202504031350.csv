@@ -1,0 +1,6 @@
+"id","nombre","apellido_paterno","apellido_materno","telefono1","telefono2","correo","codigopostal","calle","numero_int","numero_ext","colonia","fecha_nac","rfc"
+1,Rodrigo,Olmedo,Vera,"3310054257","3310054257",rolmedo36@yahoo.com.mx,"45645",Boulevard Bosques de Santa Anita,"31","2100","146080","1974-07-03",OEVR740703TW0
+2,TUVAL,VERA,PEREZ,"3312345678","23",tuval@tuval.com,"45500",CONOCIDO,"321","123","146618","",TUVR740703123
+3,Jaime,Saldana,"","555123456","","","","","","","","",""
+4,Carolina,Montes,Perez,"321654456","","","","","","","","",CAMP010122
+5,Patricia,Montes,"","123455677","","","","","","","","",MOPA741231

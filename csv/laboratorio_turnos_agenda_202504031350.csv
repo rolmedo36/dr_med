@@ -1,0 +1,2 @@
+"id","turno_id","turno_num","fecha","hora","hora_atencion","mostrado","liberado","producto_id","consultorio","medico_id","cliente_id"
+67,"4",1,"2025-04-03","12:34:32","13:41:28",N,S,"2",Consultorio 1,"0","4"

@@ -1,0 +1,15 @@
+"id","nombre","programa","menu_id"
+1,Consultorios,consultorios/,1
+2,Medicos,medicos/,1
+3,Productos,productos/9,1
+4,Clientes,clientes/9,1
+5,Reservar Consulta,citas/,2
+6,Citas,informe_citas/,3
+7,Atender Cita,atender_cita/,2
+8,Turnos,turnos/,4
+9,Abrir Consultorio,abrir_consultorio/,2
+10,Turnos Pantalla,turnos_pantalla/,4
+11,Liberar Turno,turno_liberar/,2
+12,Atender Turno,atender_consuta/,2
+13,Expediente Clínico,expediente/,3
+14,Clilente Turno,clientes_turno/,4
