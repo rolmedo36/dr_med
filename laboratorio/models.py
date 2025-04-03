@@ -30,6 +30,7 @@ class Consultorios(models.Model):
 class Medicos(models.Model):
     consultorio = models.ForeignKey(Consultorios, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=200)
+    cedula = models.CharField(max_length=200, default='')
 
     def __str__(self):
         return self.nombre + " - " + self.consultorio.nombre
@@ -117,6 +118,8 @@ class Turnos_agenda(models.Model):
     liberado = models.CharField(max_length=1, default='N')
     producto_id = models.CharField(max_length=10, default='6')
     consultorio = models.CharField(max_length=100, default='')
+    medico_id = models.CharField(max_length=2, default='0')
+
 
     def __str__(self):
         return str(self.id) + " - " + self.turno_id + " - " + self.fecha + " - " + self.hora

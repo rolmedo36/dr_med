@@ -9,8 +9,8 @@ class CreateNewConsultorio(forms.Form):
 
 
 class CreateNewMedico(forms.Form):
-    nombre = forms.CharField(label='Nombre:', max_length=100,
-                             widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Nombre del médico'}))
+    nombre = forms.CharField(label='Nombre:', max_length=100, widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Nombre del médico'}))
+    cedula = forms.CharField(label='Cedula:', max_length=100, widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Cédula prosesional'}))
 
 
 class CreateNewProductos(forms.Form):

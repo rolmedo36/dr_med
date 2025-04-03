@@ -95,7 +95,8 @@ def medicos(request):
         })
     else:
         vnombre = request.POST['nombre']
-        Medicos.objects.create(nombre=vnombre)
+        vcedula = request.POST['cedula']
+        Medicos.objects.create(nombre=vnombre, cedula=vcedula)
         return redirect('medicos')
 
 
@@ -216,6 +217,8 @@ def clientes_turno2(request):
     today = date.today()
     vfecha = today.strftime("%Y-%m-%d")
     vfecha2 = today.strftime("%d-%m-%Y")
+    now = datetime.now()
+    vhora = now.strftime("%H:%M:%S")
     if request.method == 'POST':
         vturno_cte = ''
         vturno_cte = request.POST['btnTurno']
@@ -229,6 +232,14 @@ def clientes_turno2(request):
         vturno_siguiente = turno_siguiente()
 
         vsiguiente = str(vturno_siguiente) + " - " + vcliente_nombre
+        # Crea registro
+        Turnos_agenda.objects.create(
+            turno_id=vturno_id,
+            turno_num=vturno_siguiente,
+            fecha=vfecha,
+            hora=vhora,
+            mostrado='N'
+        )
         # Imprime ticket
         imprime_ticket(vturno_descripcion, vsiguiente, vfecha2)
     return redirect('/clientes_turno/')
@@ -860,15 +871,16 @@ def atender_consuta(request):
 
             # Lee datos de medico
             vquery = f"""
-                        SELECT m.nombre 
+                        SELECT m.nombre, m.cedula
                         FROM laboratorio_medicos m
                         WHERE 1=1
                             AND m.id = '{vmedico}' 
                         """
+            print("QUERY MEDICO: ", vquery)
             r = my_custom_sql(vquery)
             vmedico_datos = ""
             for i in r:
-                vmedico_datos = i[0]
+                vmedico_datos = i[0] + '|' + str(i[1])
 
             # Imprime la receta en PDF
             pdf_path = imprime_receta(vreceta, dt_archivo, vmedico_datos)
@@ -995,6 +1007,11 @@ def imprime_receta(vreceta, varchivo, vmedico):
     varchivo = varchivo + ".pdf"
     # vimagen = 'C:\\Users\\rolme\\Documents\\projects\\laboratorio\\laboratorio\\static\\logo1.jpeg'
     vimagen = '/opt/progs/it911/laboratorio/static/logo1.jpeg'
+    vmedico = vmedico.split("|")
+    vmedico_nombre = vmedico[0]
+    vmedico_cedula = vmedico[1]
+
+    print(vmedico)
 
     # -*- coding: iso-8859-1 -*-
     pdf = FPDF()
@@ -1022,12 +1039,12 @@ def imprime_receta(vreceta, varchivo, vmedico):
     pdf.line(100.0, 25.0, 100.0, 57.0)
     pdf.set_font('arial', 'B', 14.0)
     pdf.set_xy(100.0, 27.5)
-    pdf.cell(ln=0, h=5.5, align='L', w=10.0, txt=vmedico, border=0)
+    pdf.cell(ln=0, h=5.5, align='L', w=10.0, txt=vmedico_nombre, border=0)
 
     pdf.set_xy(100.0, 33.0)
     pdf.cell(ln=0, h=7.0, align='L', w=60.0, txt='Cédula Prof.:', border=0)
     pdf.set_xy(135.0, 33.0)
-    pdf.cell(ln=0, h=7.0, align='L', w=40.0, txt='1234567890', border=0)
+    pdf.cell(ln=0, h=7.0, align='L', w=40.0, txt=vmedico_cedula, border=0)
 
     # pdf.set_xy(125.0, 32.5)
     # pdf.cell(ln=0, h=9.5, align='L', w=60.0, txt='00000001', border=0)
@@ -1253,7 +1270,8 @@ def imprime_ticket(vturno, vsiguiente, vfecha):
         # f.write(b'\x1B\x61\x02') # Right
         # f.write(b'\x1B\x21\x10')  # Double height text
         f.write(b'\x1D\x21\x11')  # Double height & width (big text)
-        f.write(b'Dr.MED\n\n')  # Print text
+        f.write(b'Dr.MED\n')  # Print text
+        f.write(b'Comprometidos con tu salud\n\n')  # Print text
         f.write(b'TURNO\n\n')  # Print text
         f.write(b'\x1D\x21\x00')  # Reset to normal size
         f.write(b'\x1B\x45\x01')  # Enable Bold
