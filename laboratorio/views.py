@@ -174,11 +174,82 @@ def productos(request, id):
 
     return redirect('/productos/9')
 
+def clientes_turno(request):
+    if request.method == 'POST':
+        vturno_cte = ''
+        vcliente = request.POST['buscar']
+        vq = f"""
+            SELECT 
+                id,
+                nombre, 
+                apellido_paterno, 
+                apellido_materno, 
+                telefono1, 
+                rfc 
+            FROM laboratorio_clientes c 
+            WHERE 1=1
+                AND (c.nombre like '%{vcliente}%' OR 
+                    c.apellido_paterno like '%{vcliente}%' OR 
+                    c.apellido_materno like '%{vcliente}%' OR 
+                    c.telefono1 like '%{vcliente}%' OR 
+                    c.rfc like '%{vcliente}%' )
+        """
+        rows = my_custom_sql(vq)
+        result_list = [
+            {'id': row[0], 'nombre': row[1], 'apellido_paterno': row[2],'apellido_materno': row[3] , 'telefono': row[4], 'rfc': row[5]}
+            for row in rows
+        ]
+        turnos = list(Turnos.objects.values())
+        return render(request, 'clientes_turno.html', {
+            'title': 'TURNO',
+            'bandera': '1',
+            'rows': result_list,
+            'turnos': turnos
+        })
+    else:
+        return render(request, 'clientes_turno.html', {
+            'title': 'TURNO',
+            'bandera': '0'
+        })
+
+def clientes_turno2(request):
+    today = date.today()
+    vfecha = today.strftime("%Y-%m-%d")
+    vfecha2 = today.strftime("%d-%m-%Y")
+    if request.method == 'POST':
+        vturno_cte = ''
+        vturno_cte = request.POST['btnTurno']
+        # selecciono turno para un cliente
+        vturno_cte = request.POST['btnTurno']
+        vturno_cte = vturno_cte.split('|')
+        vcliente_id = vturno_cte[0]
+        vturno_id = vturno_cte[1]
+        vcliente_nombre = vturno_cte[2]
+        vturno_descripcion = vturno_cte[3]
+        vturno_siguiente = turno_siguiente()
+
+        vsiguiente = str(vturno_siguiente) + " - " + vcliente_nombre
+        # Imprime ticket
+        imprime_ticket(vturno_descripcion, vsiguiente, vfecha2)
+    return redirect('/clientes_turno/')
 
 def clientes(request, id):
     id1 = str(id)
     id2 = id1[0:1]
     id3 = id1[1:]
+    vnombre = ''
+    vapellido_paterno = ''
+    vapellido_materno = ''
+    vtelefono1 = ''
+    vtelefono2 = ''
+    vcorreo = ''
+    vcp = ''
+    vcolonia = ''
+    vcalle = ''
+    vnumero_ext = ''
+    vnumero_int = ''
+    vfecha_nac =  ''
+    vrfc = ''
     if request.method == 'POST' and request.POST['tipo'] == '1':
         vnombre = request.POST['nombre']
         vapellido_paterno = request.POST['apellido_paterno']
@@ -186,12 +257,14 @@ def clientes(request, id):
         vtelefono1 = request.POST['telefono1']
         vtelefono2 = request.POST['telefono2']
         vcorreo = request.POST['correo']
-        vcp = request.POST['codigo_postal']
-        vcolonia = request.POST['cboColonia']
-        vcalle = request.POST['calle']
-        vnumero_ext = request.POST['numero_ext']
-        vnumero_int = request.POST['numero_int']
+        if request.POST['codigo_postal']:
+            vcp = request.POST['codigo_postal']
+            vcolonia = request.POST['cboColonia']
+            vcalle = request.POST['calle']
+            vnumero_ext = request.POST['numero_ext']
+            vnumero_int = request.POST['numero_int']
         vfecha_nac = request.POST['fecha_nac']
+        vrfc = request.POST['rfc']
         Clientes.objects.create(
             nombre=vnombre,
             apellido_paterno=vapellido_paterno,
@@ -204,7 +277,8 @@ def clientes(request, id):
             numero_ext=vnumero_ext,
             numero_int=vnumero_int,
             colonia=vcolonia,
-            fecha_nac=vfecha_nac
+            fecha_nac=vfecha_nac,
+            rfc=vrfc
         )
         return redirect('/clientes/9')
     if request.method == 'POST' and request.POST['tipo'] == '2':
@@ -218,6 +292,7 @@ def clientes(request, id):
         vcalle = request.POST['calle']
         vnumero_ext = request.POST['numero_ext']
         vnumero_int = request.POST['numero_int']
+        vrfc = request.POST['rfc']
 
         cliente = Clientes.objects.get(id=vid)
         cliente.nombre = vnombre
@@ -229,6 +304,7 @@ def clientes(request, id):
         cliente.calle = vcalle
         cliente.numero_ext = vnumero_ext
         cliente.numero_int = vnumero_int
+        cliente.rfc = vrfc
 
         cliente.save()
         return redirect('/clientes/9')
@@ -852,13 +928,11 @@ def turnos(request):
         vhora = now.strftime("%H:%M:%S")
         # Lee el ultimo
         vq = f"""
-            -- SELECT turno_num FROM laboratorio_turnos_agenda WHERE fecha='{vfecha}' AND turno_id='{vturno}' ORDER BY id DESC LIMIT 1
             SELECT turno_num FROM laboratorio_turnos_agenda WHERE fecha='{vfecha}' ORDER BY id DESC LIMIT 1
             """
         r = my_custom_sql(vq)
         if len(r) > 0:
             for turno in r:
-                print(turno[0])
                 vnumero = turno[0]
         else:
             vnumero = 0
@@ -899,6 +973,22 @@ def turno_liberar(request):
         'title': 'LIBERAR TURNOS',
     })
 
+def turno_siguiente():
+    today = date.today()
+    vfecha = today.strftime("%Y-%m-%d")
+    vnumero = 0
+    # Lee el ultimo
+    vq = f"""
+        SELECT turno_num FROM laboratorio_turnos_agenda WHERE fecha='{vfecha}' ORDER BY id DESC LIMIT 1
+        """
+    r = my_custom_sql(vq)
+    if len(r) > 0:
+        for turno in r:
+            vnumero = turno[0]
+    else:
+        vnumero = 0
+
+    return vnumero + 1
 
 def imprime_receta(vreceta, varchivo, vmedico):
     vpath = "/opt/progs/it911/static/pdfs/"
@@ -1141,29 +1231,31 @@ def turnos_pantalla3(request):
 
 
 def imprime_ticket(vturno, vsiguiente, vfecha):
-    vdescripcion = ''
+    vdescripcion = vturno
+    vsiguiente = str(vsiguiente)
     now = datetime.now()
     dt_archivo = now.strftime("%d%m%Y%H%M%S")
     varchivo = dt_archivo + ".bin"
-    # Lee el ultimo
-    vq = f"""
-        SELECT descripcion FROM laboratorio_turnos WHERE id='{vturno}'
-        """
-    r = my_custom_sql(vq)
-    if len(r) > 0:
-        for turno in r:
-            vdescripcion = turno[0]
 
-    vsiguiente = str(vsiguiente)
+    # Lee el ultimo
+    # vq = f"""
+    #     SELECT descripcion FROM laboratorio_turnos WHERE id='{vturno}'
+    #     """
+    # r = my_custom_sql(vq)
+    # if len(r) > 0:
+    #     for turno in r:
+    #         vdescripcion = turno[0]
 
     with open(varchivo, "wb") as f:
         f.write(b'\x1B\x40')  # Initialize printer
         # f.write(b'\x1B\x61\x00') # Left
         f.write(b'\x1B\x61\x01') # Center
         # f.write(b'\x1B\x61\x02') # Right
-        f.write(b'\x1B\x21\x10')  # Double height text
+        # f.write(b'\x1B\x21\x10')  # Double height text
+        f.write(b'\x1D\x21\x11')  # Double height & width (big text)
         f.write(b'Dr.MED\n\n')  # Print text
         f.write(b'TURNO\n\n')  # Print text
+        f.write(b'\x1D\x21\x00')  # Reset to normal size
         f.write(b'\x1B\x45\x01')  # Enable Bold
         f.write(b'\x1D\x21\x11')  # Double width & height (big text)
         f.write(vdescripcion.encode('utf-8'))  # Write text in bold

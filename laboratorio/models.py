@@ -62,9 +62,10 @@ class Clientes(models.Model):
     numero_ext = models.CharField(max_length=20, default="")
     colonia = models.CharField(max_length=20, default="")
     fecha_nac = models.CharField(max_length=20, default="")
+    rfc = models.CharField(max_length=13, default="")
 
     def __str__(self):
-        return str(self.id) + " - " + self.nombre + " - "
+        return str(self.id) + " - " + self.nombre
 
 
 class Citas(models.Model):

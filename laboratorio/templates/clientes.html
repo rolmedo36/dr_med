@@ -52,6 +52,10 @@
                         <label>APELLIDO MATERNO:</label>
                         {{ form.apellido_materno }}
                     </td>
+                    <td scope="col">
+                        <label>RFC:</label>
+                        {{ form.rfc }}
+                    </td>
                 </tr>
                 <tr align="right">
                      <td scope="col" >
@@ -116,7 +120,7 @@
         <input type="hidden" id="id" name="id" value="{{clientes.id}}">
         <main class="rov2">
             <table class="table rov2" title="MODIFICA CLIENTE">
-<tr>
+                <tr>
                     <td scope="col" align="left">
                         <label>NOMBRE:</label>
                          <input type="text" size="40" id="nombre" name="nombre" value="{{clientes.nombre}}">
@@ -128,6 +132,10 @@
                     <td scope="col" align="left">
                         <label>APELLIDO MATERNO:</label>
                          <input type="text" size="40" id="apellido_materno" name="apellido_materno" value="{{clientes.apellido_materno}}">
+                    </td>
+                    <td scope="col" align="left">
+                        <label>RFC:</label>
+                         <input type="text" size="13" id="rfc" name="rfc" value="{{clientes.rfc}}">
                     </td>
                 </tr>
                 <tr>

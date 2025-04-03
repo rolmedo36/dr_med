@@ -1,5 +1,5 @@
-import os
-import subprocess
+my_string = "1|3"
+parsed_values = my_string.split('|')
 
-os.system(f"xdg-open '../27032025102258.pdf'")
-# subprocess.run(['xdg-open', '../27032025102258.pdf'])
+# The result will be a list with the split values
+print(parsed_values[0])  # Output: ['1', '3']

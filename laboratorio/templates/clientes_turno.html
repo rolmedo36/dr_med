@@ -1,0 +1,52 @@
+{% extends "layouts/base2.html" %}
+
+{% load static %}
+
+{% block content %}
+
+    <input type="hidden" name="tipo" id="tipo" value="{{nuevo}}">
+    {% if bandera == '0' %}
+    <form action="" method="post">
+        {% csrf_token %}
+
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="buscar-label">Buscar:</span>
+          <input type="text" id="buscar" name="buscar" class="form-control" placeholder="Nombre / Apellido / Telefono / RFC" aria-label="cliente" aria-describedby="buscar-label">
+            <a href="/clientes/0" style="text-decoration:none" >⏺️ Nuevo</a>
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+    {% elif bandera == '1' %}
+    <form action="/clientes_turno2/" method="post">
+    {% csrf_token %}
+
+            <h1>{{ row.nombre }}</h1>
+            <div class="formfield">
+            <table class="table" title="BUSCA CLIENTE">
+                <th scope="col">Cliente</th>
+                <th scope="col">Telefono</th>
+                <th scope="col">RFC</th>
+                <th><a href="/clientes/0" style="text-decoration:none" >⏺️ Nuevo</a></th>
+                {% for row in rows %}
+                <tr align="center">
+                    <td scope="col">{{ row.nombre }} {{ row.apellido_paterno }} {{ row.apellido_materno }}</td>
+                    <td scope="col">{{ row.telefono }}</td>
+                    <td scope="col">{{ row.rfc }}</td>
+                    {% for turno in turnos %}
+                    <td colspan="5" style="padding: 1px;">
+                        <button type="submit" class="btn btn-primary btn-lg" style="height:40px;width:130px; font-size: 15px;"
+                                id="btnTurno" name="btnTurno" value="{{ row.id }}|{{ turno.id }}|{{ row.nombre }} {{ row.apellido_paterno }}|{{ turno.descripcion }}" >
+                            {{ turno.descripcion }}
+                        </button>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4" scope="col"><button type="submit" class="btn btn-primary">Aceptar</button></td>
+                </tr>
+            </table>
+            </div>
+    </form>
+    {% endif %}
+{% endblock %}
