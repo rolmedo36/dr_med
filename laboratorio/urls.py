@@ -33,6 +33,7 @@ urlpatterns = [
     path('turno_liberar/', views.turno_liberar, name='turno_liberar'),
     path('atender_consuta/', views.atender_consuta, name='atender_consuta'),
     path('get_turno/<str:turno_num>', views.get_turno, name='get_turno'),
+    path('get_buscaturno/<str:turno_num>', views.get_buscaturno, name='get_buscaturno'),
     # para downloads
     path('download_pdf/<str:filename>', views.serve_pdf, name='download_pdf'),
 

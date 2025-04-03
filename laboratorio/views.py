@@ -235,6 +235,7 @@ def clientes_turno2(request):
         # Crea registro
         Turnos_agenda.objects.create(
             turno_id=vturno_id,
+            cliente_id=vcliente_id,
             turno_num=vturno_siguiente,
             fecha=vfecha,
             hora=vhora,
@@ -809,8 +810,15 @@ def atender_consuta(request):
         vturno_num = request.POST['turno_num']
         # Busca el tipo de servicio de acuerdo al turno
         vquery = f"""
-            SELECT turno_id, producto_id FROM laboratorio_turnos_agenda 
-            WHERE fecha = '{vfecha}' AND turno_num = '{vturno_num}'
+            SELECT 
+                ta.turno_id, 
+                ta.producto_id,
+                ta.cliente_id
+            FROM 
+                laboratorio_turnos_agenda ta 
+            WHERE 1=1
+                AND fecha = '{vfecha}' 
+                AND turno_num = '{vturno_num}'
         """
         t = my_custom_sql(vquery)
         vservicio = ''
@@ -820,6 +828,7 @@ def atender_consuta(request):
             for tr in t:
                 vservicio = tr[0]
                 vproducto = tr[1]
+                vcliente_id = tr[2]
                 vqp = f"""
                     SELECT precio FROM laboratorio_productos WHERE id = '{vproducto}'
                 """
@@ -830,7 +839,6 @@ def atender_consuta(request):
             # Lee todos los datos capturados por el medico
             vreceta = request.POST['txtIndicacionesMedicas']
             vmedico = request.POST['cboMedicos']
-            vcliente_id = request.POST['cboClientes']
             vconsultorio_id = '0'
 
             medico_id = request.POST['cboMedicos']
@@ -929,6 +937,33 @@ def get_turno(request, turno_num):
 
     return JsonResponse(data)
 
+def get_buscaturno(request, turno_num):
+    today = date.today()
+    vfecha = today.strftime("%Y-%m-%d")
+
+    vt = f"""
+        SELECT 
+            -- ta.hora_atencion,
+            CONCAT(c.nombre,' ', c.apellido_paterno) as nombre
+         FROM 
+            laboratorio_turnos_agenda ta,
+            laboratorio_clientes c             
+        WHERE 1=1
+            AND fecha = '{vfecha}' 
+            AND turno_num = '{turno_num}' 
+            AND hora_atencion = ''
+            AND c.id = ta.cliente_id
+    """
+    lista_turno = my_custom_sql(vt)
+
+    # Si existe el turno y no ha sido atendido
+    if len(lista_turno) > 0:
+        data = {'message': "Success", 'clientes': lista_turno}
+    # Puede existir el turno pero ya fue atendido
+    else:
+        data = {'message': "0"}
+
+    return JsonResponse(data)
 
 def turnos(request):
     if request.method == 'POST':
@@ -1115,15 +1150,18 @@ def turnos_pantalla(request):
         SELECT 
             ta.turno_num, 
             ta.consultorio,
-            t.descripcion 
+            t.descripcion ,
+            c.nombre
         FROM 
             laboratorio_turnos_agenda ta,            
-            laboratorio_turnos t         
+            laboratorio_turnos t,
+            laboratorio_clientes c         
         WHERE 1=1
             AND fecha = '{dt_string}'
             AND liberado = 'S'
             AND hora_atencion = ''
             AND t.id = ta.turno_id
+            AND c.id = ta.cliente_id
         ORDER By turno_num 
     """
     r = my_custom_sql(vq)
@@ -1132,7 +1170,7 @@ def turnos_pantalla(request):
     consultorio = ''
     turno = ''
     for i in r:
-        j += ('{"consultorio": "' + str(i[1]) + '", "turno": "' + str(i[0]) + '", "descripcion": "' + str(i[2]) + '"' + '},')
+        j += ('{"consultorio": "' + str(i[1]) + '", "turno": "' + str(i[0]) + ' - ' + i[3] + '", "descripcion": "' + str(i[2]) + '"' + '},')
 
     j += ']'
     j = j[0:len(j) - 2] + ']'

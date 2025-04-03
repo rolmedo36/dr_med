@@ -17,26 +17,30 @@
             <table class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Turno: <input autofocus size="3" type="text" id="turno_num" name="turno_num"></th>
+                    <th>
+                        Turno: <input autofocus size="3" type="text" id="turno_num" name="turno_num">
+                        <input size="15" type="text" id="cliente_nombre" name="cliente_nombre" disabled>
+
+                    </th>
                     <th colspan="2">Médico:
                         <select id="cboMedicos" name="cboMedicos"></select>
                     </th>
                     <th>Checkin: {{fecha_ini}}</th>
                 </tr>
                 <tr align="left">
-                    <th>
-                        <label>Buscar cliente:</label>
-                        <input type="text" size="20" id="inCliente" placeholder="Escriba nombre">
-                        <input type="button" value="Buscar">
-                        <input type="button" value="Dar de alta" onclick="clientes()">
-                    </th>
-                </tr>
-                <tr align="left">
-                    <th>
-                        <label id="txtCliente">Seleccione Cliente:</label>
-                        <select id="cboClientes" name="cboClientes"></select>
-                    </th>
-                </tr>
+<!--                    <th>-->
+<!--                        <label>Buscar cliente:</label>-->
+<!--                        <input type="text" size="20" id="inCliente" placeholder="Escriba nombre">-->
+<!--                        <input type="button" value="Buscar">-->
+<!--                        <input type="button" value="Dar de alta" onclick="clientes()">-->
+<!--                    </th>-->
+<!--                </tr>-->
+<!--                <tr align="left">-->
+<!--                    <th>-->
+<!--                        <label id="txtCliente">Seleccione Cliente:</label>-->
+<!--                        <select id="cboClientes" name="cboClientes"></select>-->
+<!--                    </th>-->
+<!--                </tr>-->
                 </thead>
             </table>
         </div>
@@ -131,7 +135,7 @@
         </div>
     </div>
 </form>
-<script src="{% static 'js/medicos.js' %}"></script>
+<script src="{% static 'js/atiende_consulta.js' %}"></script>
 <script>
 function clientes() {
   location.replace("/clientes/0")

@@ -119,6 +119,7 @@ class Turnos_agenda(models.Model):
     producto_id = models.CharField(max_length=10, default='6')
     consultorio = models.CharField(max_length=100, default='')
     medico_id = models.CharField(max_length=2, default='0')
+    cliente_id = models.CharField(max_length=2, default='0')
 
 
     def __str__(self):
