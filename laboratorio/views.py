@@ -1306,16 +1306,17 @@ def imprime_ticket(vturno, vsiguiente, vfecha):
         # f.write(b'\x1B\x61\x00') # Left
         f.write(b'\x1B\x61\x01') # Center
         # f.write(b'\x1B\x61\x02') # Right
-        # f.write(b'\x1B\x21\x10')  # Double height text
         f.write(b'\x1D\x21\x11')  # Double height & width (big text)
         f.write(b'Dr.MED\n')  # Print text
+        f.write(b'\x1B\x21\x10')  # Double height text
         f.write(b'Comprometidos con tu salud\n\n')  # Print text
-        f.write(b'TURNO\n\n')  # Print text
         f.write(b'\x1D\x21\x00')  # Reset to normal size
         f.write(b'\x1B\x45\x01')  # Enable Bold
-        f.write(b'\x1D\x21\x11')  # Double width & height (big text)
+        f.write(b'\x1B\x21\x10')  # Double height text
+        # f.write(b'TURNO\n\n')  # Print text
         f.write(vdescripcion.encode('utf-8'))  # Write text in bold
         f.write(b'\n\n')  # Enable Bold
+        f.write(b'TURNO: ')  # Print text
         f.write(vsiguiente.encode('utf-8'))  # Write text in bold
         f.write(b'\x1B\x45\x00') # Disable BOLD
         f.write(b'\x1D\x21\x00')  # Reset to normal size
