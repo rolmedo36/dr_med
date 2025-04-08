@@ -1325,8 +1325,18 @@ def imprime_ticket(vturno, vsiguiente, vfecha):
         f.write(b'\n\n')  # Enable Bold
         f.write(b'\x1D\x56\x00')  # Cut paper
 
-    printer_name = "principal"  # Replace with your printer's name
-    os.system(f"lp -d {printer_name} -o raw {varchivo} &")
+    printer_name = "recepcion_ticket"  # Replace with your printer's name
+    samba_share = r"//192.168.100.23/recepcion_ticket"  # Samba server share path
+    username = "printer"
+    password = "GPS2022."
+
+    # Use smbclient to print (authenticate with username and password)
+    command = f'smbclient {samba_share} -U {username}%{password} -c "print {varchivo}"'
+
+    # Execute the command
+    subprocess.run(command, shell=True)
+    # Command with sudo to include password (though this is not secure)
+    # os.system(f"lp -d {printer_name} -o raw {varchivo} &")
 
 # Function to replace newlines in the text
 def escape_newlines(data):
