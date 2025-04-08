@@ -7,6 +7,7 @@
 
 <form action="" method="POST">
     {% csrf_token %}
+    <button onclick="openFullScreen()">Go Full Screen</button>
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
@@ -56,9 +57,33 @@
     </div>
 </form>
 
+<!--<script>-->
+<!--    setTimeout(function(){-->
+<!--        window.location.reload();-->
+<!--    }, 10000);-->
+<!--</script>-->
 <script>
     setTimeout(function(){
         window.location.reload();
     }, 10000);
-</script>
+
+    // Function to trigger full screen
+    function openFullScreen() {
+        // Check if the browser supports full screen
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+            document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+            document.documentElement.msRequestFullscreen();
+        }
+    }
+
+    // Trigger full screen when the page loads
+    window.onload = function() {
+        openFullScreen();
+    }
+    </script>
 {% endblock %}
