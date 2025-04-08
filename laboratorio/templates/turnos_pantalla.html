@@ -68,21 +68,24 @@
 
     // Function to trigger full screen
     function openFullScreen() {
-        // Check if the browser supports full screen
         if (document.documentElement.requestFullscreen) {
             document.documentElement.requestFullscreen();
         } else if (document.documentElement.mozRequestFullScreen) { // Firefox
             document.documentElement.mozRequestFullScreen();
-        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
             document.documentElement.webkitRequestFullscreen();
         } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
             document.documentElement.msRequestFullscreen();
         }
     }
 
-    // Trigger full screen when the page loads
-    window.onload = function() {
-        openFullScreen();
-    }
+    // Listen for when the full screen changes and log it
+    document.addEventListener("fullscreenchange", function() {
+        if (!document.fullscreenElement) {
+            console.log("Exited full screen.");
+        } else {
+            console.log("Entered full screen.");
+        }
+    });
     </script>
 {% endblock %}

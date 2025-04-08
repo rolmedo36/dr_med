@@ -25,10 +25,11 @@
             }
     </style>
 </head>
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 rov">
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'drmed-logo03.png' %}" alt="Bootstrap" width="40" height="40">
-        </a>
+<!--    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 rov"> -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-white mb-4 rov">
+<!--        <a class="navbar-brand" href="#">-->
+<!--            <img align="center" src="{% static 'logo_w.png' %}" alt="Bootstrap" width="100%" height="80%">-->
+<!--        </a>-->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -38,10 +39,15 @@
             <a class="nav-link active" aria-current="page" href="/">Regresar</a>
           </li>
         </ul>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <img align="center" src="{% static 'logo_w.png' %}" alt="Bootstrap" width="100%" height="80%">
+          </li>
+        </ul>
       </div>
     </nav>
-<body class="text-center rov2" style="background-image: url('{% static 'drmed-logo03.png' %}'); background-size: contain; background-position: center center; background-repeat: no-repeat; background-attachment: fixed;">
-<!-- <body class="text-center rov2"> -->
+<!-- <body class="text-center rov2" style="background-image: url('{% static 'drmed-logo03.png' %}'); background-size: contain; background-position: center center; background-repeat: no-repeat; background-attachment: fixed;"> -->
+<body class="text-center rov2">
     {% block content %}
     {% endblock %}
 </body>
