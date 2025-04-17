@@ -13,6 +13,7 @@ const buscaTurno=async(turno_num) =>{
                 vcliente = cliente;
             });
             cliente_nombre.value=vcliente;
+            cliente_nombre2.value=vcliente;
         }else{
             alert('Turno incorrecto !!!');
             document.getElementById('turno_num').focus();

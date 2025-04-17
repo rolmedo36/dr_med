@@ -1,9 +1,9 @@
-{% extends "layouts/base3.html" %}
+{% extends "layouts/base5.html" %}
 
 {% load static %}
 
 {% block content %}
-<h1>{{ title }}</h1>
+
 
 <form action="" method="post">
     {% csrf_token %}
@@ -20,6 +20,7 @@
                     <th>
                         Turno: <input autofocus size="3" type="text" id="turno_num" name="turno_num">
                         <input size="15" type="text" id="cliente_nombre" name="cliente_nombre" disabled>
+                        <input size="15" type="text" id="cliente_nombre2" name="cliente_nombre2" hidden="">
 
                     </th>
                     <th colspan="2">Médico:
@@ -126,7 +127,7 @@
                 </tr>
                 <tr>
                     <td colspan="4">
-                        <button type="submit">Fin de consulta</button>
+                        <button type="button" onclick="form.submit()">Fin de consulta</button>
                     </td>
                 </tr>
 

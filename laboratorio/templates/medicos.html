@@ -42,6 +42,8 @@
                         {% endfor %}
                         </select>
                     </th>
+                </tr>
+                <tr>
                     <th scope="col">{{ form.as_p }}</th>
                 </tr>
                 <tr>
@@ -52,11 +54,39 @@
     {% else %}
         <h1>MODIFICA</h1>
         <main class="rov2">
-            <table class="table rov2" title="NUEVO MEDICO">
+            <table class="table rov2" title="">
                 <tr>
                     <th scope="col">
                         <label>Nombre:
                             <input type="text" size="40" id="nombre" name="nombre" value="{{nombre}}">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col">
+                        <label>Cedula:
+                            <input type="text" size="40" id="cedula" name="cedula" value="{{cedula}}">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col">
+                        <label>Universidad:
+                            <input type="text" size="40" id="universidad" name="universidad" value="{{universidad}}">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col">
+                        <label>Especialidad:
+                            <input type="text" size="40" id="especialidad" name="especialidad" value="{{especialidad}}">
+                        </label>
+                    </th>
+                </tr>
+                <tr>
+                    <th scope="col">
+                        <label>Horario:
+                            <input type="text" size="40" id="horario" name="horario" value="{{horario}}">
                         </label>
                     </th>
                 </tr>

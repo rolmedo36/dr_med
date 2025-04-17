@@ -31,6 +31,9 @@ class Medicos(models.Model):
     consultorio = models.ForeignKey(Consultorios, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=200)
     cedula = models.CharField(max_length=200, default='')
+    especialidad = models.CharField(max_length=200, default='')
+    horario = models.CharField(max_length=200, default='')
+    universidad = models.CharField(max_length=200, default='')
 
     def __str__(self):
         return self.nombre + " - " + self.consultorio.nombre
