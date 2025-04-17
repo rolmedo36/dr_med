@@ -99,7 +99,6 @@ def medicos(request):
         Medicos.objects.create(nombre=vnombre, cedula=vcedula)
         return redirect('medicos')
 
-
 def medicos_mantto(request, id):
     i = str(id)
     tipo = str(i[0:1])
@@ -108,12 +107,24 @@ def medicos_mantto(request, id):
     if request.method == 'POST' and request.POST['tipo'] == '1':
         vconsultorio = request.POST['consultorio']
         vnombre = request.POST['nombre']
-        Medicos.objects.create(nombre=vnombre, consultorio_id=vconsultorio)
+        vcedula = request.POST['cedula']
+        vuni = request.POST['universidad']
+        vesp = request.POST['especialidad']
+        vhorario = request.POST['horario']
+        Medicos.objects.create(nombre=vnombre, consultorio_id=vconsultorio, cedula=vcedula, universidad=vuni, especialidad=vesp, horario=vhorario)
         return redirect('medicos')
     if request.method == 'POST' and request.POST['tipo'] == '2':
         vnombre = request.POST['nombre']
+        vcedula = request.POST['cedula']
+        vuni = request.POST['universidad']
+        vesp = request.POST['especialidad']
+        vhorario = request.POST['horario']
         medico = Medicos.objects.get(id=id2)
         medico.nombre = vnombre
+        medico.cedula = vcedula
+        medico.universidad = vuni
+        medico.especialidad = vesp
+        medico.horario = vhorario
         medico.save()
         return redirect('medicos')
 
@@ -131,12 +142,22 @@ def medicos_mantto(request, id):
     else:
         medico = Medicos.objects.get(id=id2)
         nombre = medico.nombre
+        cedula = medico.cedula
+        universidad = medico.universidad
+        especialidad = medico.especialidad
+        horario = medico.horario
+
         return render(request, 'medicos.html', {
             'title': 'MODIFICA MEDICO',
             'nuevo': '2',
             'form': CreateNewMedico,
             'id': id2,
-            'nombre': nombre
+            'nombre': nombre,
+            'cedula': cedula,
+            'universidad': universidad,
+            'especialidad': especialidad,
+            'horario': horario,
+
         })
 
     return redirect('medicos')
@@ -797,7 +818,7 @@ def atender_cita3(request, idcita):
         })
 
 
-def atender_consuta(request):
+def atender_consulta(request):
     now = datetime.now()
     dt_hoy = now.strftime("%Y-%m-%d")
     dt_hora = now.strftime("%H:%M:%S")
@@ -835,6 +856,15 @@ def atender_consuta(request):
                 vp = my_custom_sql(vqp)
                 for i in vp:
                     vprecio = i[0]
+            vq = f"""
+                SELECT c.nombre, c.apellido_paterno, c.apellido_materno 
+                FROM laboratorio_clientes c
+                WHERE c.id = {vcliente_id}
+            """
+            vctes = my_custom_sql(vq)
+            vcliente_nombre = ''
+            for vcte in vctes:
+                vcliente_nombre = vcte[0] + ' ' + vcte[1] + ' ' + vcte[2]
 
             # Lee todos los datos capturados por el medico
             vreceta = request.POST['txtIndicacionesMedicas']
@@ -879,19 +909,20 @@ def atender_consuta(request):
 
             # Lee datos de medico
             vquery = f"""
-                        SELECT m.nombre, m.cedula
+                        SELECT m.nombre, m.cedula, m.especialidad, m.universidad, m.horario
                         FROM laboratorio_medicos m
                         WHERE 1=1
-                            AND m.id = '{vmedico}' 
+                            AND m.id = '{vmedico}'
                         """
-            print("QUERY MEDICO: ", vquery)
             r = my_custom_sql(vquery)
             vmedico_datos = ""
             for i in r:
-                vmedico_datos = i[0] + '|' + str(i[1])
+                vmedico_datos = i[0] + '|' + str(i[1]) + '|' + str(i[2]) + '|' + str(i[3]) + '|' + str(i[4])
 
             # Imprime la receta en PDF
-            pdf_path = imprime_receta(vreceta, dt_archivo, vmedico_datos)
+            pdf_path = imprime_receta(vreceta, dt_archivo, vmedico_datos, vcliente_nombre, checkin_edad, checkin_fecha,
+                                      checkin_peso, checkin_frecuencia_cardiaca, checkin_frecuencia_respiratoria,
+                                      checkin_presion_arterial, checkin_temperatura)
             # Generate the download URL (assuming your 'download_pdf' URL is set up correctly)
             download_url = reverse('download_pdf', kwargs={'filename': pdf_path.split('/')[-1]})
 
@@ -1037,7 +1068,76 @@ def turno_siguiente():
 
     return vnumero + 1
 
-def imprime_receta(vreceta, varchivo, vmedico):
+def imprime_receta(vreceta, varchivo, vmedico, vpaciente, vedad, vfecha, vpeso, vfc, vfr, vta, vtemp):
+    vpath = "/opt/progs/it911/dr_med/static/pdfs/"
+    varchivo = varchivo + ".pdf"
+
+    vimagen = '/opt/progs/it911/dr_med/laboratorio/static/logo_receta.jpeg'
+    vimagen2 = '/opt/progs/it911/dr_med/laboratorio/static/ubicacion.png'
+    vimagen3 = '/opt/progs/it911/dr_med/laboratorio/static/telefono.png'
+
+    vmedico = vmedico.split("|")
+    vmedico_nombre = 'DR.' + vmedico[0]
+    vcedula = vmedico[2] +  ' | Ced. Prof.' + str(vmedico[1])
+
+    vuni = vmedico[3]
+    vhorario = vmedico[4]
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('helvetica', '', 13.0)
+    pdf.set_xy(100.0, 8.0)
+    pdf.image(vimagen, 20.0, 17.0, link='', type='', w=70.0, h=20.0)
+
+    pdf.set_font('arial', 'B', 12.0)
+    pdf.set_text_color(25, 37, 91)
+    pdf.set_xy(110.0, 20)
+    pdf.cell(ln=0, h=5.5, align='L', w=10.0, txt=vmedico_nombre, border=0)
+
+    pdf.set_font('arial', 'B', 8.0)
+    pdf.set_xy(115.0, 28)
+    pdf.cell(ln=0, h=0, align='L', w=0.0, txt=vuni, border=0)
+
+    pdf.set_font('arial', '', 8.0)
+    pdf.set_xy(120.0, 32.0)
+    pdf.cell(ln=0, h=0.0, align='L', w=0.0, txt=vcedula, border=0)
+
+    pdf.set_xy(115.0, 36)
+    pdf.cell(ln=0, h=0.0, align='L', w=0.0, txt=vhorario, border=0)
+
+    pdf.set_font('arial', '', 12.0)
+    pdf.set_xy(30.0, 50.0)
+    pdf.cell(ln=0, h=0.0, align='L', w=0.0, txt='Paciente: ' + vpaciente, border=0)
+    pdf.set_xy(30.0, 60.0)
+    pdf.cell(ln=0, h=0.0, align='L', w=0.0,
+             txt='Edad: ' + vedad + '          Fecha: ' + vfecha + '          Peso: ' + vpeso, border=0)
+    pdf.set_xy(30.0, 70.0)
+    pdf.cell(ln=0, h=0.0, align='L', w=0.0,
+             txt='F.C. ' + vfc + '          F.R. ' + vfr + '          TA. ' + vta + '          TEMP:' + vtemp, border=0)
+
+    pdf.set_xy(20.0, 80.0)
+    pdf.multi_cell(
+        h=6.0,
+        align='L',
+        w=200.0,
+        txt=f"""{vreceta}
+                  """,
+        border=0)
+
+    pdf.image(vimagen2, 20.0, 230.0, link='', type='', w=7.0, h=7.0)
+    pdf.image(vimagen3, 20.0, 240.0, link='', type='', w=7.0, h=7.0)
+
+    pdf.set_font('arial', '', 10.0)
+    pdf.set_xy(28.0, 234.0)
+    pdf.cell(ln=0, h=0.0, align='L', w=0.0, txt='Av Tepeyac 5048 L 101, Col Chapalita, Zapopan, Jal.', border=0)
+    pdf.set_xy(28.0, 244.0)
+    pdf.cell(ln=0, h=0.0, align='L', w=0.0, txt='33-37-07-53-56 | 33-50-23-88-32', border=0)
+    # save the pdf with name .pdf
+
+    pdf.output(vpath + varchivo, 'F')
+    return vpath + varchivo
+
+def imprime_receta3(vreceta, varchivo, vmedico):
     vpath = "/opt/progs/it911/static/pdfs/"
     varchivo = varchivo + ".pdf"
     # vimagen = 'C:\\Users\\rolme\\Documents\\projects\\laboratorio\\laboratorio\\static\\logo1.jpeg'
@@ -1135,7 +1235,7 @@ def abrir_consultorio(request):
 
         consultorio.save()
 
-        return redirect('index')
+        return redirect('/atender_consulta/')
     return render(request, 'abrir_consultorio.html', {
         'title': 'LIBERAR CONSULTORIO'
     })
@@ -1360,7 +1460,7 @@ def my_custom_sql(vquery):
 
 def serve_pdf(request, filename):
     # Path to the directory where PDFs are stored
-    pdf_directory = '/opt/progs/it911/static/pdfs/'
+    pdf_directory = '/opt/progs/it911/dr_med/static/pdfs/'
     pdf_path = os.path.join(pdf_directory, filename)
     print('EN EL PDF: ', pdf_path)
     if os.path.exists(pdf_path):

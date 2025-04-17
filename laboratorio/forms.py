@@ -11,6 +11,9 @@ class CreateNewConsultorio(forms.Form):
 class CreateNewMedico(forms.Form):
     nombre = forms.CharField(label='Nombre:', max_length=100, widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Nombre del médico'}))
     cedula = forms.CharField(label='Cedula:', max_length=100, widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Cédula prosesional'}))
+    universidad = forms.CharField(label='Universidad:', max_length=100, widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Universidad'}))
+    especialidad = forms.CharField(label='Especialidad:', max_length=100, widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Especialidad'}))
+    horario = forms.CharField(label='Horario:', max_length=100, widget=forms.TextInput(attrs={'size': '40', 'placeholder': 'Horario'}))
 
 
 class CreateNewProductos(forms.Form):

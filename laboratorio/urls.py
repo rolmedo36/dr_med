@@ -31,7 +31,7 @@ urlpatterns = [
     path('turnos_pantalla/', views.turnos_pantalla, name='turnos_pantalla'),
     path('abrir_consultorio/', views.abrir_consultorio, name='abrir_consultorio'),
     path('turno_liberar/', views.turno_liberar, name='turno_liberar'),
-    path('atender_consuta/', views.atender_consuta, name='atender_consuta'),
+    path('atender_consulta/', views.atender_consulta, name='atender_consulta'),
     path('get_turno/<str:turno_num>', views.get_turno, name='get_turno'),
     path('get_buscaturno/<str:turno_num>', views.get_buscaturno, name='get_buscaturno'),
     # para downloads
